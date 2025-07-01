@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天喝什么？奶茶随机推荐</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffeef8 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #ff4d6d;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .result-container {
+            background-color: #fff9fb;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px dashed #ffccd5;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .result-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.2);
+        }
+        
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4d6d;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 77, 109, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 77, 109, 0.1);
+            border-radius: 50%;
+        }
+        
+        .bubble-1 {
+            width: 100px;
+            height: 100px;
+            top: -30px;
+            left: -30px;
+        }
+        
+        .bubble-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -50px;
+            right: -50px;
+        }
+        
+        .footer {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        /* 闪动效果 */
+        .flashing {
+            animation: flash 0.2s infinite;
+        }
+        
+        @keyframes flash {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* 所有品牌列表 */
+        .all-brands {
+            width: 90%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .all-brands h2 {
+            color: #ff4d6d;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .brand-item {
+            background-color: #fff9fb;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ffccd5;
+        }
+        
+        .brand-name {
+            font-weight: bold;
+            color: #ff4d6d;
+            margin-bottom: 8px;
+        }
+        
+        .brand-drinks {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+                width: 85%;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .brand {
+                font-size: 24px;
+            }
+            
+            .recommendation {
+                font-size: 16px;
+            }
+            
+            .brands-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bubble bubble-1"></div>
+        <div class="bubble bubble-2"></div>
+        
+        <h1>今天喝什么？</h1>
+        
+        <div class="result-container">
+            <div class="brand" id="brand">点击下方按钮开始</div>
+            <div class="recommendation" id="recommendation">随机推荐奶茶品牌和饮品</div>
+        </div>
+        
+        <button class="btn" id="generateBtn">随机推荐</button>
+        
+        <div class="footer">
+            点击按钮随机获取奶茶推荐，每天都有新发现！
+        </div>
+    </div>
+
+    <div class="all-brands">
+        <h2>所有可能随机的奶茶品牌</h2>
+        <div class="brands-grid" id="brandsGrid">
+            <!-- 品牌列表将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 奶茶品牌及推荐饮品数据
+        const milkTeaData = [
+            { brand: "喜茶", recommendations: ["多肉葡萄", "芝芝莓莓", "满杯红柚", "芋泥波波", "烤黑糖波波"] },
+            { brand: "奈雪的茶", recommendations: ["霸气芝士草莓", "霸气橙子", "芋泥宝藏茶", "杨枝甘露宝藏茶", "葡萄撞撞宝藏茶"] },
+            { brand: "茶颜悦色", recommendations: ["幽兰拿铁", "声声乌龙", "桂花弄", "筝筝纸鸢", "蔓越阑珊"] },
+            { brand: "蜜雪冰城", recommendations: ["冰鲜柠檬水", "满杯百香果", "珍珠奶茶", "草莓摇摇奶昔", "芝士奶盖四季春"] },
+            { brand: "CoCo都可", recommendations: ["奶茶三兄弟", "鲜百香双响炮", "珍珠奶茶", "青稞奶茶", "柠檬养乐多"] },
+            { brand: "一点点", recommendations: ["波霸奶茶", "四季春玛奇朵", "冰淇淋红茶", "阿华田", "葡萄柚绿"] },
+            { brand: "书亦烧仙草", recommendations: ["书亦烧仙草", "葡萄芋圆冻冻", "杨枝甘露", "草莓啵啵酸奶", "黑糖小芋圆奶茶"] },
+            { brand: "古茗", recommendations: ["大叔奶茶", "芝士葡萄", "杨枝甘露", "西瓜椰椰", "布丁芋奶露"] },
+            { brand: "沪上阿姨", recommendations: ["血糯米奶茶", "杨枝甘露", "葡萄酸奶金砖", "厚芋泥波波奶茶", "草莓桃桃茶"] },
+            { brand: "快乐柠檬", recommendations: ["岩盐芝士奶茶", "蛋糕忌廉珍珠奶茶", "OREO曲奇奶茶", "芋圆小丸子奶茶", "柠檬菠萝冻"] },
+            { brand: "益禾堂", recommendations: ["益禾烤奶", "禾风奶绿", "芋泥啵啵奶茶", "杨枝甘露", "西瓜汁"] },
+            { brand: "贡茶", recommendations: ["熊猫奶盖茶", "寒天爱玉", "格雷三兄弟", "香米抹茶红豆", "金钻奶茶"] },
+            { brand: "鹿角巷", recommendations: ["黑糖鹿丸鲜奶", "小鹿出抹", "皇家九号奶茶", "白桃乌龙", "北极光"] },
+            { brand: "乐乐茶", recommendations: ["草莓酪酪", "葡萄酪酪", "杨枝甘露冰冰茶", "黑糖波霸脏脏茶", "玫珑蜜瓜酪酪"] },
+            { brand: "瑞幸咖啡-小鹿茶", recommendations: ["大红袍寒天牛乳茶", "陨石拿铁", "桃桃芝士红宝石茶", "葡萄很好喝", "西柚芝士茉香茶"] }
+        ];
+
+        const brandElement = document.getElementById('brand');
+        const recommendationElement = document.getElementById('recommendation');
+        const generateBtn = document.getElementById('generateBtn');
+        const brandsGrid = document.getElementById('brandsGrid');
+        
+        let isFlashing = false;
+        let flashInterval;
+        let randomizeInterval;
+
+        // 初始化显示所有品牌
+        function displayAllBrands() {
+            brandsGrid.innerHTML = '';
+            milkTeaData.forEach(item => {
+                const brandItem = document.createElement('div');
+                brandItem.className = 'brand-item';
+                
+                const brandName = document.createElement('div');
+                brandName.className = 'brand-name';
+                brandName.textContent = item.brand;
+                
+                const brandDrinks = document.createElement('div');
+                brandDrinks.className = 'brand-drinks';
+                brandDrinks.textContent = item.recommendations.join(' · ');
+                
+                brandItem.appendChild(brandName);
+                brandItem.appendChild(brandDrinks);
+                brandsGrid.appendChild(brandItem);
+            });
+        }
+
+        // 开始闪动效果
+        function startFlashing() {
+            isFlashing = true;
+            brandElement.classList.add('flashing');
+            recommendationElement.classList.add('flashing');
+            
+            // 快速切换显示不同的品牌和推荐
+            randomizeInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * milkTeaData.length);
+                const randomBrand = milkTeaData[randomIndex];
+                const randomRecIndex = Math.floor(Math.random() * randomBrand.recommendations.length);
+                
+                brandElement.textContent = randomBrand.brand;
+                recommendationElement.textContent = `推荐尝试：${randomBrand.recommendations[randomRecIndex]}`;
+            }, 100);
+        }
+
+        // 停止闪动效果
+        function stopFlashing() {
+            isFlashing = false;
+            clearInterval(randomizeInterval);
+            brandElement.classList.remove('flashing');
+            recommendationElement.classList.remove('flashing');
+            
+            // 最终确定一个随机结果
+            generateRecommendation();
+        }
+
+        // 随机生成推荐
+        function generateRecommendation() {
+            // 随机选择一个品牌
+            const randomIndex = Math.floor(Math.random() * milkTeaData.length);
+            const selectedBrand = milkTeaData[randomIndex];
+            
+            // 随机选择该品牌的一个推荐饮品
+            const randomRecIndex = Math.floor(Math.random() * selectedBrand.recommendations.length);
+            const selectedRecommendation = selectedBrand.recommendations[randomRecIndex];
+            
+            // 更新DOM
+            brandElement.textContent = selectedBrand.brand;
+            recommendationElement.textContent = `推荐尝试：${selectedRecommendation}`;
+            
+            // 添加动画效果
+            brandElement.style.animation = 'none';
+            recommendationElement.style.animation = 'none';
+            void brandElement.offsetWidth; // 触发重绘
+            void recommendationElement.offsetWidth;
+            brandElement.style.animation = 'fadeIn 0.5s ease';
+            recommendationElement.style.animation = 'fadeIn 0.7s ease';
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 初始加载时显示所有品牌
+        displayAllBrands();
+        
+        // 点击按钮时开始或停止随机
+        generateBtn.addEventListener('click', function() {
+            if (isFlashing) {
+                stopFlashing();
+                this.textContent = '随机推荐';
+            } else {
+                startFlashing();
+                this.textContent = '停止随机';
+            }
+        });
+    </script>
+</body>
+</html>
